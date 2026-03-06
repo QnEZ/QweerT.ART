@@ -1,28 +1,32 @@
 <?php
 /**
- * QweerT Punk Zine — WooCommerce archive-product.php
- * The shop / product archive page.
- *
- * Design: Full-width punk shop hero, category filter pills,
- * punk toolbar (result count + sort), 3-column sticker-card grid.
+ * QweerT Punk Zine — WooCommerce taxonomy-product_cat.php
+ * Product category archive — reuses the same shop layout.
  */
 get_header();
 ?>
 
 <main id="primary" class="content-area qweert-shop-page">
 
-    <!-- ── Shop Hero ──────────────────────────────────────── -->
+    <!-- ── Category Hero ──────────────────────────────────── -->
+    <?php
+    $current_cat = get_queried_object();
+    $cat_name    = $current_cat ? $current_cat->name : '';
+    $cat_desc    = $current_cat ? $current_cat->description : '';
+    ?>
     <div class="qweert-shop-hero">
         <div class="qweert-shop-hero__noise" aria-hidden="true"></div>
         <div class="qweert-shop-hero__stripe" aria-hidden="true"></div>
         <div class="container qweert-shop-hero__inner">
-            <div class="section-stamp"><?php esc_html_e( 'THE COLLECTION', 'qweert-punk-zine' ); ?></div>
+            <div class="section-stamp"><?php esc_html_e( 'CATEGORY', 'qweert-punk-zine' ); ?></div>
             <h1 class="qweert-shop-hero__title">
-                <?php esc_html_e( 'SHOP THE ', 'qweert-punk-zine' ); ?><span class="neon-pink"><?php esc_html_e( 'RESISTANCE', 'qweert-punk-zine' ); ?></span>
+                <span class="neon-pink"><?php echo esc_html( strtoupper( $cat_name ) ); ?></span>
             </h1>
-            <p class="qweert-shop-hero__sub">
-                <?php esc_html_e( 'Stickers, pins & art that fight back. Every purchase supports queer art and activism.', 'qweert-punk-zine' ); ?>
-            </p>
+            <?php if ( $cat_desc ) : ?>
+                <p class="qweert-shop-hero__sub"><?php echo wp_kses_post( $cat_desc ); ?></p>
+            <?php else : ?>
+                <p class="qweert-shop-hero__sub"><?php esc_html_e( 'Stickers, pins & art that fight back. Every purchase supports queer art and activism.', 'qweert-punk-zine' ); ?></p>
+            <?php endif; ?>
         </div>
         <div class="qweert-shop-hero__torn" aria-hidden="true">
             <svg viewBox="0 0 1440 32" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,18 +46,16 @@ get_header();
             'hide_empty' => true,
             'exclude'    => get_option( 'default_product_cat' ),
         ) );
-        $current_cat = get_queried_object();
-        $shop_url    = function_exists( 'wc_get_page_id' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : home_url( '/shop/' );
+        $shop_url = function_exists( 'wc_get_page_id' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : home_url( '/shop/' );
         ?>
         <?php if ( ! empty( $product_cats ) && ! is_wp_error( $product_cats ) ) : ?>
         <div class="qweert-cat-filters">
-            <a href="<?php echo esc_url( $shop_url ); ?>"
-               class="qweert-cat-pill <?php echo ( ! is_product_category() ) ? 'qweert-cat-pill--active' : ''; ?>">
+            <a href="<?php echo esc_url( $shop_url ); ?>" class="qweert-cat-pill">
                 <?php esc_html_e( 'ALL', 'qweert-punk-zine' ); ?>
             </a>
             <?php foreach ( $product_cats as $cat ) : ?>
                 <a href="<?php echo esc_url( get_term_link( $cat ) ); ?>"
-                   class="qweert-cat-pill <?php echo ( is_product_category() && $current_cat && $current_cat->term_id === $cat->term_id ) ? 'qweert-cat-pill--active' : ''; ?>">
+                   class="qweert-cat-pill <?php echo ( $current_cat && $current_cat->term_id === $cat->term_id ) ? 'qweert-cat-pill--active' : ''; ?>">
                     <?php echo esc_html( strtoupper( $cat->name ) ); ?>
                     <span class="qweert-cat-pill__count"><?php echo esc_html( $cat->count ); ?></span>
                 </a>
@@ -72,40 +74,22 @@ get_header();
             </div>
         </div>
 
-        <!-- ── Product Grid ───────────────────────────────── -->
         <?php woocommerce_product_loop_start(); ?>
-
             <?php if ( wc_get_loop_prop( 'total' ) ) : ?>
                 <?php while ( have_posts() ) : ?>
                     <?php the_post(); ?>
                     <?php wc_get_template_part( 'content', 'product' ); ?>
                 <?php endwhile; ?>
             <?php endif; ?>
-
         <?php woocommerce_product_loop_end(); ?>
 
-        <!-- ── Pagination ─────────────────────────────────── -->
         <?php do_action( 'woocommerce_after_shop_loop' ); ?>
 
         <?php else : ?>
             <?php do_action( 'woocommerce_no_products_found' ); ?>
         <?php endif; ?>
 
-        <!-- ── Activist Footer Banner ─────────────────────── -->
-        <div class="qweert-shop-cta">
-            <div class="qweert-shop-cta__inner">
-                <p class="qweert-shop-cta__handwritten"><?php esc_html_e( "Can't find what you're looking for?", 'qweert-punk-zine' ); ?></p>
-                <h3 class="qweert-shop-cta__title"><?php esc_html_e( 'FIND US IN PERSON', 'qweert-punk-zine' ); ?></h3>
-                <p class="qweert-shop-cta__text">
-                    <?php esc_html_e( 'QweerT.ART vends at LunarFaire in NJ and other queer-friendly markets. Fairy jars and exclusive items available in person only!', 'qweert-punk-zine' ); ?>
-                </p>
-                <a href="<?php echo esc_url( home_url( '/#events' ) ); ?>" class="btn-punk">
-                    <?php esc_html_e( 'SEE UPCOMING EVENTS', 'qweert-punk-zine' ); ?>
-                </a>
-            </div>
-        </div>
-
-    </div><!-- .container -->
+    </div>
 
 </main>
 
