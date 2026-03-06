@@ -6,7 +6,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'QWEERT_VERSION', '1.2.0' );
+define( 'QWEERT_VERSION', '1.3.0' );
 define( 'QWEERT_DIR', get_template_directory() );
 define( 'QWEERT_URI', get_template_directory_uri() );
 

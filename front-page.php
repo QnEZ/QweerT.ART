@@ -6,7 +6,7 @@
 get_header();
 
 // Customizer values
-$hero_bg      = qweert_get_option( 'qweert_hero_bg', '' );
+$hero_bg      = qweert_get_option( 'qweert_hero_bg', get_template_directory_uri() . '/assets/images/hero-bg.webp' );
 $hero_line1   = qweert_get_option( 'qweert_hero_line1', 'CELEBRATING' );
 $hero_line2   = qweert_get_option( 'qweert_hero_line2', 'QUEER ART' );
 $hero_line3   = qweert_get_option( 'qweert_hero_line3', '& INCLUSIVITY' );
@@ -24,9 +24,7 @@ $facebook     = qweert_get_option( 'qweert_facebook_url', 'https://www.facebook.
      HERO SECTION
      ============================================================ -->
 <section class="hero-section scanlines" id="hero">
-    <?php if ( $hero_bg ) : ?>
-        <div class="hero-bg" style="background-image:url('<?php echo esc_url( $hero_bg ); ?>');"></div>
-    <?php endif; ?>
+    <div class="hero-bg" style="background-image:url('<?php echo esc_url( $hero_bg ); ?>');"></div>
     <div class="hero-overlay"></div>
     <div class="trans-stripe-left"></div>
 
