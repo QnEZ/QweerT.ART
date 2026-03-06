@@ -6,7 +6,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'QWEERT_VERSION', '1.0.0' );
+define( 'QWEERT_VERSION', '1.2.0' );
 define( 'QWEERT_DIR', get_template_directory() );
 define( 'QWEERT_URI', get_template_directory_uri() );
 
@@ -401,3 +401,41 @@ function qweert_customizer( $wp_customize ) {
 function qweert_get_option( $key, $default = '' ) {
     return get_theme_mod( $key, $default );
 }
+
+/* ============================================================
+   GITHUB UPDATER
+   Hooks into WordPress's native update system so that update
+   notifications appear in Appearance -> Themes automatically.
+   Admin page: Appearance -> QweerT Theme
+   ============================================================ */
+require_once QWEERT_DIR . '/inc/class-github-updater.php';
+require_once QWEERT_DIR . '/inc/admin-page.php';
+
+/**
+ * Singleton accessor for the updater instance.
+ * Only instantiated in the admin context.
+ *
+ * @return QweerT_GitHub_Updater|null
+ */
+function qweert_get_updater_instance() {
+    static $instance = null;
+    if ( null === $instance && is_admin() ) {
+        $theme   = wp_get_theme();
+        $version = $theme->get( 'Version' );
+        $token   = get_option( 'qweert_github_token', '' );
+        $instance = new QweerT_GitHub_Updater(
+            'QnEZ',             // GitHub user / org
+            'QweerT.ART',       // GitHub repo name
+            'qweert-punk-zine', // Theme slug (folder name)
+            $version,
+            $token
+        );
+    }
+    return $instance;
+}
+
+// Initialise the updater early in admin so the update transient filter
+// is registered before WordPress checks for updates.
+add_action( 'admin_init', function () {
+    qweert_get_updater_instance();
+}, 1 );
